@@ -1,0 +1,108 @@
+Autores:
+	Zuleimi Gonzales
+	Oscar Uribe
+	Juan Diego Torres
+
+Descripcion:
+1. Mouse USB:
+	Se utilizó un arduino due, el cual tiene la posibilidad de ser USBhost.
+	La librería MouseContoller.h permite la creación de un objeto MouseContoller, el cual tiene los métodos:
+		•	  virtual void OnMouseMove(MOUSEINFO *mi);
+		•	  virtual void OnLeftButtonUp(MOUSEINFO *mi);
+		•	  virtual void OnLeftButtonDown(MOUSEINFO *mi);
+		•	  virtual void OnMiddleButtonUp(MOUSEINFO *mi);
+		•	  virtual void OnMiddleButtonDown(MOUSEINFO *mi);
+		•	  virtual void OnRightButtonUp(MOUSEINFO *mi);
+		•	  virtual void OnRightButtonDown(MOUSEINFO *mi);
+	cada uno de estos permite conocer una acción diferente que se realiza con el mouse. Lo único que se necesita para poder arrancar a leer el mouse es:
+		1. 	declarar un objeto de la clase USBHost: USBHost usb
+		2.	declarar un objeto de la clase MuseController: MouseController mouse(usb);
+		3.	implementar los métodos
+			a.	void mouseMoved()
+			b.	void mouseDragged()
+			c.	void mousePressed()
+			d.	void mouseReleased()
+		4.	en el setup se necesita comenzar la comunicación serial: Serial.begin(9600)
+		5.	y en el loop se necesita llamar al método task del objeto creado en el paso 1, esto para que el arduino pueda leer que sucede en el mouse en cada iteración que realice: usb.Task()
+
+	Ejemplo de la pagina de arduino:
+
+		https://www.arduino.cc/en/Reference/MouseControllerConstructor
+		#include <MouseController.h>
+
+		// Initialize USB Controller
+		USBHost usb;
+
+		// Attach mouse controller to USB
+		MouseController mouse(usb);
+
+		void setup(){
+		  Serial.begin(9600);
+		}
+
+		void loop(){
+		  usb.Task();
+		}
+
+		void mouseMoved() {
+		  Serial.print("Move: ");
+		  Serial.print(mouse.getXChange());
+		  Serial.print(", ");
+		  Serial.println(mouse.getYChange());
+		}
+
+	Libreria:
+		https://github.com/arduino-libraries/USBHost/blob/master/src/MouseController.h
+
+2. Teclado USB:
+	Se utilizó un arduino due, el cual tiene la posibilidad de ser USBhost.
+	La librería KeyBoardController.h permite la creación de un objeto KeyBoardController, el cual tiene los métodos:
+		•	uint8_t getKey()       { return key; }
+		•	uint8_t getModifiers() { return modifiers; }
+		•	uint8_t getOemKey()    { return keyOem; }
+		•	virtual void OnKeyDown(uint8_t mod, uint8_t key)
+		•	virtual void OnKeyUp(uint8_t mod, uint8_t key)
+	los cuales permiten conocer que tecla se presionó y por cuánto tiempo se mantuvo presionada, esta librería usa el protocolo USB y HID: http://www.rennes.supelec.fr/ren/fi/elec/docs/usb/hid1_11.pdf.
+	Para poder usar esta librería se requiere:
+		1.	declarar un objeto de la clase USBhost: USBHost usb
+		2.	declarar un objeto de la clase KeyBoardContoller: KeyBoardController mouse(usb);
+		3.	implementar los métodos
+			a.	void keyPressed()
+			b.	void keyReleased()
+			c.	void printKey() este devuelve la traducción a ASCII
+		4.	en el setup se necesita comenzar la comunicación serial: Serial.begin(9600)
+		5.	y en el loop se necesita llamar al método task del objeto creado en el paso 1, esto para que el arduino pueda leer que sucede en el teclado en cada iteración que realice: usb.Task()
+
+		Libreria:
+			https://github.com/arduino-libraries/USBHost/blob/master/src/KeyboardController.h
+
+3. Mouse PS2
+	se uso la libreria ps2dev.h, para este proyecto no se requiere ninguna board de arduino en especial, esta libreria implementa el protocolo ps2.
+	en el codigo se muestra la implementacion de los siguientes metodos:
+		1. ack() 
+		2. mousecommand(int command)
+	para que funcione se requiere que: 
+		1. se declare el mouse: PS2dev mouse(5,1)
+		2. sus botones: char buttons[3] = {0,0,0}
+		3. en el setup que se inicialice:
+			while(mouse.write(0xAA)!=0);  
+  			while(mouse.write(0x00)!=0);
+
+  	Libreria:
+  		https://github.com/kristopher/PS2-Mouse-Arduino/blob/master/PS2Mouse.h
+
+4. Teclado PS2:
+	informacion:
+		http://playground.arduino.cc/Main/PS2Keyboard
+
+	se uso la libreria predeterminada de arduino PS2Keyboard.h.
+	para la implementacion del teclado se requiere:
+	1. declarar un variable tipo PS2Keyboard: PS2Keyboard keyboard
+	2. en el setup comenzar la comunicacion serial: Serial.begin(9600)
+	3. en el loop:
+		a. para ver si el teclado esta disponible se usa el comando: keyboard.available()
+		b. para leer la tecla se recive un byte el cual luego se imprime en ASCII: keyboard.available()
+
+
+	Libreria:
+		https://github.com/PaulStoffregen/PS2Keyboard/blob/master/PS2Keyboard.h
