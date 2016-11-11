@@ -1,7 +1,7 @@
 
 #include "ps2dev.h"
 
-PS2dev mouse(5,1); // 2 data 3clock
+PS2dev mouse(3,2); // 2 data 3clock
 
 char buttons[3] = {0,0,0};
 
